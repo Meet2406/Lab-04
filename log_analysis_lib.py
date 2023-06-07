@@ -2,15 +2,21 @@
 Library of functions that are useful for analyzing plain-text log files.
 """
 import re
+import sys
+import os
+import pandas as pd
 
 def main():
     # Get the log file path from the command line
     log_path = get_file_path_from_cmd_line()
 
     # TODO: Use filter_log_by_regex() to investigate the gateway log per Step 5
+    records, captures = filter_log_by_regex(log_path, r"pam",print_summary=True,print_records=True)
 
     # TODO: Use filter_log_by_regex() to extract data from the gateway log per Step 6
-
+    _, captures = filter_log_by_regex(log_path, r"SRC= (.*?) DST=(.?) LEN=(.*?)", )[1]
+    df = pd.DataFrame(captures)
+    df.to_csv('capture_csv', index=False , header=('Source_IP', 'Destination_IP', 'Length'))
     return
 
 def get_file_path_from_cmd_line(param_num=1):
@@ -26,7 +32,19 @@ def get_file_path_from_cmd_line(param_num=1):
         str: File path
     """
     # TODO: Implement the function body per Step 3
-    return
+    num_params = len(sys.argv) - 1
+    if num_params < param_num:
+        print("Error: File path not provided.")
+        sys.exit()
+
+    file_path = os.path.abspath(sys.argv[param_num])
+
+    #Check wheather the file exists or not.
+    if not os.path.isfile(file_path):
+         print("Error:File path not provided.")
+         sys.exit()
+
+    return 
 
 def filter_log_by_regex(log_path, regex, ignore_case=True, print_summary=False, print_records=False):
     """Gets a list of records in a log file that match a specified regex.
