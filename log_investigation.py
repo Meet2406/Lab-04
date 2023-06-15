@@ -69,8 +69,12 @@ def generate_invalid_user_report():
     """
     # TODO: Complete function body per step 9
     # Get data from records that show attempted invalid user login
-
+    invalid_user_logs = log_analysis_lib.filter_log_by_regex(log_path, r'Invalid user (.+?) from ')[1]
     # Generate the CSV report
+    df = pd.DataFrame(invalid_user_logs)
+    csv_filename = "invalid_user_report.csv"
+    heading = ('Date', 'Time', 'Username', 'IP address')
+    df.to_csv(csv_filename, index=False, header=heading)
     return
 
 def generate_source_ip_log(ip_address):
